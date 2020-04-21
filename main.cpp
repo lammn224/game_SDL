@@ -1,16 +1,8 @@
-﻿#include <iostream>
-#include <Windows.h>
-#include <string>
-#include <SDL.h>
-#include <SDL_image.h>
-using namespace std;
+﻿#include "HamChung.h"
+#include "NhanVat.h"
 
-static SDL_Window* gWindows = NULL;
-static SDL_Renderer* gScreen = NULL;
-static SDL_Event gEvent;
-
-const int width = 1200;			// chiều rộng màn hình
-const int heigth = 600;			// chiều dài màn hình
+HamChung gBackground;
+NhanVat bird;
 
 bool initialize()
 {
@@ -51,7 +43,15 @@ void close()
 int main(int argc, char* argv[])
 {
 	bool isQuit = false;
-	if (initialize() < 0) return -1;
+
+	if (initialize() == false) return -1;
+
+	gBackground.setRect(0, 0);
+	gBackground.LoadAnh("bg4.png", gScreen);
+
+	bird.setRect(200, 200);
+	bird.LoadAnh("angrybird.png", gScreen);
+
 
 	while (!isQuit)
 	{
@@ -62,9 +62,24 @@ int main(int argc, char* argv[])
 				isQuit = true;
 				break;
 			}
+
+			bird.NhapPhimDiChuyen(gEvent);
 		}
+
+		SDL_RenderClear(gScreen);
+
+		//background
+		gBackground.Render(gScreen);
+
+		//update liên tục hình ảnh bird
+		bird.Dichuyen();
+		bird.Render(gScreen);
+
+		// hiện thị lên màn hình
+		SDL_RenderPresent(gScreen);
 	}
 
+	bird.free();
 	close();
 	return 0;
 }
