@@ -8,9 +8,10 @@ bool initialize()
 {
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) return false;
 
-	gWindows = SDL_CreateWindow("GAME_SDL2_Passing_Obstacle", SDL_WINDOWPOS_UNDEFINED,
-		SDL_WINDOWPOS_UNDEFINED, width, heigth,
-		SDL_WINDOW_SHOWN);
+	gWindows = SDL_CreateWindow("GAME_SDL2_Passing_Obstacle", 
+								SDL_WINDOWPOS_UNDEFINED,
+								SDL_WINDOWPOS_UNDEFINED, width, heigth,
+								SDL_WINDOW_SHOWN);
 
 	if (gWindows == NULL) return false;
 
@@ -23,6 +24,7 @@ bool initialize()
 
 	int imgFlags = IMG_INIT_PNG;
 	//cout << IMG_Init(imgFlags) << " " << imgFlags;
+
 	if (!(IMG_Init(imgFlags) && imgFlags)) return false;
 
 	return true;
@@ -52,9 +54,13 @@ int main(int argc, char* argv[])
 	bird.setRect(200, 200);
 	bird.LoadAnh("angrybird.png", gScreen);
 
+	int startTime = SDL_GetTicks();
 
 	while (!isQuit)
 	{
+		cout << "starTime = " << startTime << endl;
+		//cout << "	i = " << i << endl;
+
 		while (SDL_PollEvent(&gEvent))
 		{
 			if (gEvent.type == SDL_QUIT || gEvent.key.keysym.sym == SDLK_ESCAPE)
@@ -67,19 +73,25 @@ int main(int argc, char* argv[])
 		}
 
 		SDL_RenderClear(gScreen);
-
 		//background
 		gBackground.Render(gScreen);
 
-		//update liên tục hình ảnh bird
-		bird.Dichuyen();
-		bird.Render(gScreen);
+		if (startTime < 1000) startTime = SDL_GetTicks();
+		if (startTime >= 1000)
+		{
+			bird.Dichuyen();
+			bird.Render(gScreen);
+			startTime = SDL_GetTicks();
+			//cout << "	new i = " << i << endl;
+			cout << "			new time: " << startTime << endl;
+		}
 
-		// hiện thị lên màn hình
+		// hiển thị lên màn hình
 		SDL_RenderPresent(gScreen);
 	}
 
 	bird.free();
+	gBackground.free();
 	close();
 	return 0;
 }

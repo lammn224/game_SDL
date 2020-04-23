@@ -24,16 +24,16 @@ void NhanVat::NhapPhimDiChuyen(SDL_Event events)
 		switch (events.key.keysym.sym)
 		{
 		case SDLK_UP:
-			y_value = y_value - heigth_NhanVat / 40;
+			y_value = y_value - heigth_NhanVat / 35;
 			break;
 		case SDLK_DOWN:
-			y_value = y_value + heigth_NhanVat / 40;
+			y_value = y_value + heigth_NhanVat / 35;
 			break;
 		case SDLK_RIGHT:
-			x_value = x_value + heigth_NhanVat / 30;
+			x_value = x_value + heigth_NhanVat / 25;
 			break;
 		case SDLK_LEFT:
-			x_value = x_value - heigth_NhanVat / 30;
+			x_value = x_value - heigth_NhanVat / 25;
 			break;
 		default:
 			break;
@@ -65,7 +65,7 @@ void NhanVat::NhapPhimDiChuyen(SDL_Event events)
 void NhanVat::Dichuyen()
 {
 	vitri.x += x_value;
-	cout << "vitri.x = " << vitri.x << "			x_value = " << x_value << endl;
+	//cout << "vitri.x = " << vitri.x << "			x_value = " << x_value << endl;
 	// nếu quá màn hình -> không di chuyển
 	if (vitri.x < 0 || vitri.x + width_NhanVat > width + 50) vitri.x -= x_value;
 	//x_value = 0;
