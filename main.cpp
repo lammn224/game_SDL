@@ -1,8 +1,10 @@
 ﻿#include "HamChung.h"
 #include "NhanVat.h"
-
+#include "VatCan.h"
+#include <ctime>
 HamChung gBackground;
 NhanVat bird;
+VatCan* obstacle = new VatCan[soVatcan];
 
 bool initialize()
 {
@@ -54,6 +56,25 @@ int main(int argc, char* argv[])
 	bird.setRect(200, 200);
 	bird.LoadAnh("angrybird.png", gScreen);
 
+
+	for (int i = 0; i < soVatcan; i++)
+	{
+		VatCan* vatcan = obstacle + i;
+		srand((int)time(0));
+		int random_y = rand() % 400;			// khởi tạo giá trị ngẫu nhiên vị trí trên màn hình cho mỗi vật cản
+
+		if (random_y > heigth - 100) random_y = heigth * 0.3;		// nếu random lớn hơn chiều cao thì mặc định giá trị này
+
+		// gán vị trí ban đầu của mỗi vật cản
+		vatcan->setRect(width + i * 300, random_y);
+
+		vatcan->LoadAnh("pig.png", gScreen);		// load ảnh vật cản
+		//vatcan->render(gscreen);
+
+		// gán tốc độ di chuyển của vật cản
+		vatcan->setX_value(1);
+	}
+
 	int startTime = SDL_GetTicks();
 
 	while (!isQuit)
@@ -75,6 +96,15 @@ int main(int argc, char* argv[])
 		SDL_RenderClear(gScreen);
 		//background
 		gBackground.Render(gScreen);
+
+		for (int i = 0; i <soVatcan; i++)
+		{
+			VatCan* vatcan = (obstacle + i);
+
+			// update liên tục hình ảnh quái vật
+			vatcan->DichuyenM();
+			vatcan->Render(gScreen);
+		}
 
 		if (startTime < 1000) startTime = SDL_GetTicks();
 		if (startTime >= 1000)

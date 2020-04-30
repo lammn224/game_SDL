@@ -14,6 +14,7 @@ static SDL_Event gEvent;
 
 const int width = 1200;			// chiều rộng màn hình
 const int heigth = 600;			// chiều dài màn hình
+const int soVatcan = 4;			// số lượng vật cản
 
 class HamChung
 {
