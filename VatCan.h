@@ -3,7 +3,7 @@
 
 #include "HamChung.h"
 
-// kích thước monster
+// kích thước vật cản
 #define widthVatcan 89
 #define heigthVatcan 89
 

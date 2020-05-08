@@ -67,7 +67,7 @@ void NhanVat::Dichuyen()
 	vitri.x += x_value;
 	//cout << "vitri.x = " << vitri.x << "			x_value = " << x_value << endl;
 	// nếu quá màn hình -> không di chuyển
-	if (vitri.x < 0 || vitri.x + width_NhanVat > width + 50) vitri.x -= x_value;
+	if (vitri.x < 0 || vitri.x + width_NhanVat > width + 10) vitri.x -= x_value;
 	//x_value = 0;
 
 	vitri.y += y_value;

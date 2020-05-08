@@ -6,6 +6,53 @@ HamChung gBackground;
 NhanVat bird;
 VatCan* obstacle = new VatCan[soVatcan];
 
+bool isLose(SDL_Rect nhanvat, SDL_Rect vatcan)
+{
+	int left_a = nhanvat.x;
+	int right_a = nhanvat.x + nhanvat.w;
+	int top_a = nhanvat.y;
+	int bottom_a = nhanvat.y + nhanvat.h;
+
+	int left_b = vatcan.x;
+	int right_b = vatcan.x + vatcan.w;
+	int top_b = vatcan.y;
+	int bottom_b = vatcan.y + vatcan.h;
+
+	if (left_a > left_b && left_a < right_b)
+	{
+		if (top_a > top_b && top_a < bottom_b)
+		{
+			return true;
+		}
+
+		else if (bottom_a > top_b && bottom_a < bottom_b)
+		{
+			return true;
+		}
+	}
+
+	if (right_a > left_b && right_a < right_b)
+	{
+		if (top_a > top_b && top_a < bottom_b)
+		{
+			return true;
+		}
+
+		else if (bottom_a > top_b && bottom_a < bottom_b)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool isWin(SDL_Rect nhanvat)
+{
+	if (nhanvat.x >= width - 89) return true;
+	return false;
+}
+
 bool initialize()
 {
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) return false;
@@ -46,16 +93,16 @@ void close()
 
 int main(int argc, char* argv[])
 {
-	bool isQuit = false;
-
 	if (initialize() == false) return -1;
+
+	retry:
+	bool isQuit = false;
 
 	gBackground.setRect(0, 0);
 	gBackground.LoadAnh("bg4.png", gScreen);
 
 	bird.setRect(200, 200);
 	bird.LoadAnh("angrybird.png", gScreen);
-
 
 	for (int i = 0; i < soVatcan; i++)
 	{
@@ -104,6 +151,42 @@ int main(int argc, char* argv[])
 			// update liên tục hình ảnh quái vật
 			vatcan->DichuyenM();
 			vatcan->Render(gScreen);
+
+			bool lose = isLose(bird.getRect(), vatcan->getRect());
+			if (lose)
+			{
+				int msBox = MessageBox(NULL, "====YOU LOSE====", "	====END GAME====", MB_RETRYCANCEL);
+				switch (msBox)
+				{
+				case IDCANCEL:
+					bird.free();
+					delete[] obstacle;	// giải phóng bộ nhớ
+					close();			// giải phóng dữ liệu
+					return 0;
+
+				case IDRETRY:
+					goto retry;
+				}
+				//return 0;
+
+			}
+
+			bool win = isWin(bird.getRect());
+			if (win)
+			{
+				int msBox = MessageBox(NULL, "====YOU WON====", "	====END GAME====", MB_RETRYCANCEL);
+				switch (msBox)
+				{
+				case IDCANCEL:
+					bird.free();
+					delete[] obstacle;	// giải phóng bộ nhớ
+					close();			// giải phóng dữ liệu
+					return 0;
+
+				case IDRETRY:
+					goto retry;
+				}
+			}
 		}
 
 		if (startTime < 1000) startTime = SDL_GetTicks();
