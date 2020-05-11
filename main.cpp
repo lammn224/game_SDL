@@ -5,6 +5,9 @@
 HamChung gBackground;
 NhanVat bird;
 VatCan* obstacle = new VatCan[soVatcan];
+HamChung gIntro;
+HamChung play;
+HamChung exit_button;
 
 bool isLose(SDL_Rect nhanvat, SDL_Rect vatcan)
 {
@@ -94,6 +97,53 @@ void close()
 int main(int argc, char* argv[])
 {
 	if (initialize() == false) return -1;
+
+	gIntro.setRect(0, 0);
+	gIntro.LoadAnh("intro.png", gScreen);
+
+	play.setRect(500, 250);
+	play.LoadAnh("PlayPixelArt.png", gScreen);
+
+	exit_button.setRect(500, 400);
+	exit_button.LoadAnh("ExitPixelArt.png", gScreen);
+
+	SDL_Event menuE;
+	while (true)
+	{
+		gIntro.Render(gScreen);
+		play.Render(gScreen);
+		exit_button.Render(gScreen);
+
+		//SDL_RenderClear(gScreen);
+		SDL_RenderPresent(gScreen);
+
+		while (SDL_PollEvent(&menuE))
+		{
+			switch (menuE.type)
+			{
+			case SDL_MOUSEBUTTONDOWN:
+				if (menuE.button.x >= 500 && menuE.button.x <= 700
+					&& menuE.button.y >= 250 && menuE.button.y <= 350)
+				{
+					goto retry;
+				}
+
+				if (menuE.button.x >= 500 && menuE.button.x <= 700
+					&& menuE.button.y >= 400 && menuE.button.y <= 500)
+				{
+					close();
+					return 1;
+				}
+				break;
+
+			case SDL_QUIT:
+				close();
+				return 0;
+				break;
+			}
+		}
+
+	}
 
 	retry:
 	bool isQuit = false;

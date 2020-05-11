@@ -22,7 +22,7 @@ bool HamChung::LoadAnh(string path, SDL_Renderer* screen)
 	if (load_surface != NULL)
 	{
 		// xóa phông trắng 
-		SDL_SetColorKey(load_surface, SDL_TRUE, SDL_MapRGB(load_surface->format, 255, 255, 255));
+		//SDL_SetColorKey(load_surface, SDL_TRUE, SDL_MapRGB(load_surface->format, 255, 255, 255));
 
 		// lưu hình ảnh vào texture
 		new_texture = SDL_CreateTextureFromSurface(screen, load_surface);
