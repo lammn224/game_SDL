@@ -8,6 +8,8 @@ VatCan* obstacle = new VatCan[soVatcan];
 HamChung gIntro;
 HamChung play;
 HamChung exit_button;
+Mix_Music* gMusic = NULL;
+Mix_Chunk* gScratch = NULL;
 
 bool isLose(SDL_Rect nhanvat, SDL_Rect vatcan)
 {
@@ -73,11 +75,12 @@ bool initialize()
 
 	SDL_SetRenderDrawColor(gScreen, 255, 255, 255, 255);
 
-
+	// khởi tạo IMG
 	int imgFlags = IMG_INIT_PNG;
-	//cout << IMG_Init(imgFlags) << " " << imgFlags;
-
 	if (!(IMG_Init(imgFlags) && imgFlags)) return false;
+
+	// khởi tạo audio
+	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) == -1) return false;
 
 	return true;
 }
@@ -106,6 +109,9 @@ int main(int argc, char* argv[])
 
 	exit_button.setRect(500, 400);
 	exit_button.LoadAnh("ExitPixelArt.png", gScreen);
+
+	gMusic = Mix_LoadMUS("main_theme.mp3");
+	gScratch = Mix_LoadWAV("sfx_hit.wav");
 
 	SDL_Event menuE;
 	while (true)
@@ -187,6 +193,11 @@ int main(int argc, char* argv[])
 				break;
 			}
 
+			if (!Mix_PlayingMusic())
+				Mix_PlayMusic(gMusic, -1);
+			else if (Mix_PausedMusic())
+				Mix_ResumeMusic();
+
 			bird.NhapPhimDiChuyen(gEvent);
 		}
 
@@ -205,6 +216,8 @@ int main(int argc, char* argv[])
 			bool lose = isLose(bird.getRect(), vatcan->getRect());
 			if (lose)
 			{
+				Mix_PlayChannel(-1, gScratch, 0);
+				Mix_PauseMusic();
 				int msBox = MessageBox(NULL, "====YOU LOSE====", "	====END GAME====", MB_RETRYCANCEL);
 				switch (msBox)
 				{

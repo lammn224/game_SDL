@@ -6,6 +6,7 @@
 #include <string>
 #include <SDL.h>
 #include <SDL_image.h>
+#include <SDL_mixer.h>
 using namespace std;
 
 static SDL_Window* gWindows = NULL;
