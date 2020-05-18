@@ -10,6 +10,7 @@ HamChung play;
 HamChung exit_button;
 Mix_Music* gMusic = NULL;
 Mix_Chunk* gScratch = NULL;
+Mix_Chunk* gWin = NULL;
 
 bool isLose(SDL_Rect nhanvat, SDL_Rect vatcan)
 {
@@ -94,6 +95,7 @@ void close()
 	gWindows = NULL;
 
 	IMG_Quit();
+	Mix_Quit();
 	SDL_Quit();
 }
 
@@ -112,6 +114,7 @@ int main(int argc, char* argv[])
 
 	gMusic = Mix_LoadMUS("main_theme.mp3");
 	gScratch = Mix_LoadWAV("sfx_hit.wav");
+	gWin = Mix_LoadWAV("sfx_end.wav");
 
 	SDL_Event menuE;
 	while (true)
@@ -237,6 +240,8 @@ int main(int argc, char* argv[])
 			bool win = isWin(bird.getRect());
 			if (win)
 			{
+				Mix_PlayChannel(-1, gWin, 0);
+				Mix_PauseMusic();
 				int msBox = MessageBox(NULL, "====YOU WON====", "	====END GAME====", MB_RETRYCANCEL);
 				switch (msBox)
 				{
