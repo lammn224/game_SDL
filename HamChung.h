@@ -7,6 +7,7 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_mixer.h>
+#include <SDL_ttf.h>
 using namespace std;
 
 static SDL_Window* gWindows = NULL;
@@ -48,7 +49,6 @@ public:
 protected:				// thừa kế
 	SDL_Texture* object;
 	SDL_Rect vitri;
-
 };
 
 #endif // !HAMCHUNG_H_

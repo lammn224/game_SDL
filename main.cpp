@@ -1,6 +1,7 @@
 ﻿#include "HamChung.h"
 #include "NhanVat.h"
 #include "VatCan.h"
+#include "Text.h"
 #include <ctime>
 HamChung gBackground;
 NhanVat bird;
@@ -11,6 +12,7 @@ HamChung exit_button;
 Mix_Music* gMusic = NULL;
 Mix_Chunk* gScratch = NULL;
 Mix_Chunk* gWin = NULL;
+TTF_Font* font_time;
 
 bool isLose(SDL_Rect nhanvat, SDL_Rect vatcan)
 {
@@ -63,10 +65,12 @@ bool initialize()
 {
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) return false;
 
-	gWindows = SDL_CreateWindow("GAME_SDL2_Passing_Obstacle", 
-								SDL_WINDOWPOS_UNDEFINED,
-								SDL_WINDOWPOS_UNDEFINED, width, heigth,
-								SDL_WINDOW_SHOWN);
+	gWindows = SDL_CreateWindow("GAME_SDL2_Passing_Obstacle",	// tiêu đề
+								SDL_WINDOWPOS_UNDEFINED,		// x
+								SDL_WINDOWPOS_UNDEFINED,		// y	
+								width,							// rộng
+								heigth,							// dài
+								SDL_WINDOW_SHOWN);				// hiển thị
 
 	if (gWindows == NULL) return false;
 
@@ -78,10 +82,16 @@ bool initialize()
 
 	// khởi tạo IMG
 	int imgFlags = IMG_INIT_PNG;
-	if (!(IMG_Init(imgFlags) && imgFlags)) return false;
+	if (!(IMG_Init(imgFlags) & imgFlags)) return false;
 
 	// khởi tạo audio
+	// tần số lấy mẫu đầu ra , định dạng mẫu đầu ra, 2: âm thanh nổi, Byte được sử dụng trên mỗi mẫu đầu ra.
 	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) == -1) return false;
+
+	//khoi tao text
+	if (TTF_Init() == -1) return false;
+	font_time = TTF_OpenFont("lunchds.ttf", 15);
+	if (font_time == NULL) return false;
 
 	return true;
 }
@@ -95,7 +105,10 @@ void close()
 	gWindows = NULL;
 
 	IMG_Quit();
+	Mix_FreeMusic(gMusic);
+	Mix_FreeChunk(gScratch);
 	Mix_Quit();
+	TTF_Quit();
 	SDL_Quit();
 }
 
@@ -122,8 +135,6 @@ int main(int argc, char* argv[])
 		gIntro.Render(gScreen);
 		play.Render(gScreen);
 		exit_button.Render(gScreen);
-
-		//SDL_RenderClear(gScreen);
 		SDL_RenderPresent(gScreen);
 
 		while (SDL_PollEvent(&menuE))
@@ -151,11 +162,17 @@ int main(int argc, char* argv[])
 				break;
 			}
 		}
-
 	}
 
 	retry:
 	bool isQuit = false;
+
+	//tạo một text và set màu 
+	Text time_game;
+	time_game.SetColor();
+
+	//thời gian cho phép
+	int life_time = SDL_GetTicks() / 1000 + 15;
 
 	gBackground.setRect(0, 0);
 	gBackground.LoadAnh("bg4.png", gScreen);
@@ -169,16 +186,16 @@ int main(int argc, char* argv[])
 		srand((int)time(0));
 		int random_y = rand() % 400;			// khởi tạo giá trị ngẫu nhiên vị trí trên màn hình cho mỗi vật cản
 
-		if (random_y > heigth - 100) random_y = heigth * 0.3;		// nếu random lớn hơn chiều cao thì mặc định giá trị này
+		if (random_y > heigth - 100)
+		{
+			random_y = heigth * 0.3;				// nếu random lớn hơn chiều cao thì mặc định giá trị này
+		}
 
-		// gán vị trí ban đầu của mỗi vật cản
-		vatcan->setRect(width + i * 300, random_y);
+		vatcan->setRect(width + i * 300, random_y);	// gán vị trí ban đầu của mỗi vật cản
 
 		vatcan->LoadAnh("pig.png", gScreen);		// load ảnh vật cản
-		//vatcan->render(gscreen);
 
-		// gán tốc độ di chuyển của vật cản
-		vatcan->setX_value(1);
+		vatcan->setX_value(1);						// gán tốc độ di chuyển của vật cản	
 	}
 
 	int startTime = SDL_GetTicks();
@@ -195,9 +212,10 @@ int main(int argc, char* argv[])
 				isQuit = true;
 				break;
 			}
-
+			//đang k bật -> bật
 			if (!Mix_PlayingMusic())
 				Mix_PlayMusic(gMusic, -1);
+			//đang dừng -> tiếp tục
 			else if (Mix_PausedMusic())
 				Mix_ResumeMusic();
 
@@ -212,15 +230,15 @@ int main(int argc, char* argv[])
 		{
 			VatCan* vatcan = (obstacle + i);
 
-			// update liên tục hình ảnh quái vật
+			// update hình ảnh quái vật sau khi di chuyển 
 			vatcan->DichuyenM();
 			vatcan->Render(gScreen);
 
 			bool lose = isLose(bird.getRect(), vatcan->getRect());
 			if (lose)
 			{
-				Mix_PlayChannel(-1, gScratch, 0);
-				Mix_PauseMusic();
+				Mix_PlayChannel(-1, gScratch, 0); // bật âm thanh hiệu ứng
+				Mix_PauseMusic(); // dừng âm thanh nền
 				int msBox = MessageBox(NULL, "====YOU LOSE====", "	====END GAME====", MB_RETRYCANCEL);
 				switch (msBox)
 				{
@@ -233,8 +251,6 @@ int main(int argc, char* argv[])
 				case IDRETRY:
 					goto retry;
 				}
-				//return 0;
-
 			}
 
 			bool win = isWin(bird.getRect());
@@ -266,6 +282,36 @@ int main(int argc, char* argv[])
 			//cout << "	new i = " << i << endl;
 			cout << "			new time: " << startTime << endl;
 		}
+
+		//show time game
+		string str_timeLeft = "Timeleft: ";
+		int currentTime = SDL_GetTicks() / 1000;
+		if (life_time - currentTime < 0)	// hết thời gian
+		{
+			int msBox = MessageBox(NULL, "====YOU LOSE====", "	====OUT OF TIME====", MB_RETRYCANCEL | MB_ICONINFORMATION); // trong thư viện windows.h
+
+			switch (msBox)
+			{
+			case IDCANCEL:
+				bird.free();
+				delete[] obstacle;		// giải phóng bộ nhớ
+				close();				// giải phóng dữ liệu
+				return 0;
+
+			case IDRETRY:
+				life_time += SDL_GetTicks() / 1000;
+				goto retry;
+			}
+		}
+
+		string str_val = to_string(life_time - currentTime);
+		str_timeLeft += str_val;
+
+		//gán string vào text
+		time_game.SetText(str_timeLeft);
+		//load text lên màn hình
+		time_game.LoadFromRenderText(font_time, gScreen);
+		time_game.RenderText(gScreen, width - 200, 15);	
 
 		// hiển thị lên màn hình
 		SDL_RenderPresent(gScreen);

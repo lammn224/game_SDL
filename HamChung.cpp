@@ -54,8 +54,5 @@ void HamChung::free()
 	{
 		SDL_DestroyTexture(object);
 		object = NULL;
-		vitri.w = 0;
-		vitri.h = 0;
 	}
 }
-

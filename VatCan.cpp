@@ -24,7 +24,6 @@ void VatCan::DichuyenM()
 	// khi đi hết màn hình thì khởi tạo lại tại cuối màn hình
 	if (vitri.x < 0)
 	{
-		//
 		vitri.x = width;
 		// khởi tạo giá trị ngẫu nhiên vị trí trên màn hình cho mỗi vật cản
 		int random_y = rand() % 400;
