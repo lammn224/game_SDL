@@ -90,7 +90,7 @@ bool initialize()
 
 	//khoi tao text
 	if (TTF_Init() == -1) return false;
-	font_time = TTF_OpenFont("lunchds.ttf", 15);
+	font_time = TTF_OpenFont("lunchds.ttf", 22); // load font chữ và cỡ chữ 22
 	if (font_time == NULL) return false;
 
 	return true;
